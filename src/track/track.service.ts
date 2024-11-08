@@ -52,4 +52,28 @@ export class TrackService {
     }
     await this.favsService.removeTrack(id);
   }
+
+  async setArtistToNull(artistId: string) {
+    const tracks = await this.repositoryService.findAll();
+    for (const track of tracks) {
+      if (track.artistId === artistId) {
+        await this.repositoryService.update(track.id, {
+          ...track,
+          artistId: null,
+        });
+      }
+    }
+  }
+
+  async setAlbumToNull(albumId: string) {
+    const tracks = await this.repositoryService.findAll();
+    for (const track of tracks) {
+      if (track.albumId === albumId) {
+        await this.repositoryService.update(track.id, {
+          ...track,
+          albumId: null,
+        });
+      }
+    }
+  }
 }

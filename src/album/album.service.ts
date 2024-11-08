@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
+import { TrackService } from '../track/track.service';
 import { Album } from './album.interfaces';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
@@ -14,6 +15,8 @@ import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 export class AlbumService {
   constructor(
     private readonly repositoryService: RepositoryService<Album>,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
     @Inject(forwardRef(() => FavsService))
     private readonly favsService: FavsService,
   ) {}
@@ -50,6 +53,19 @@ export class AlbumService {
     if (!removedAlbum) {
       throw new NotFoundException();
     }
+    await this.trackService.setAlbumToNull(id);
     await this.favsService.removeAlbum(id);
+  }
+
+  async setArtistToNull(artistId: string) {
+    const albums = await this.repositoryService.findAll();
+    for (const album of albums) {
+      if (album.artistId === artistId) {
+        await this.repositoryService.update(album.id, {
+          ...album,
+          artistId: null,
+        });
+      }
+    }
   }
 }
