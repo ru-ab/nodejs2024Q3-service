@@ -1,12 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAlbumDto } from './dto/createAlbum.dto';
-import { UpdateAlbumDto } from './dto/updateAlbum.dto';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { Album } from './album.interfaces';
+import { CreateAlbumDto } from './dto/createAlbum.dto';
+import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly repositoryService: RepositoryService<Album>) {}
+  constructor(
+    private readonly repositoryService: RepositoryService<Album>,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
 
   create(createAlbumDto: CreateAlbumDto) {
     return this.repositoryService.create(createAlbumDto);
@@ -40,5 +50,6 @@ export class AlbumService {
     if (!removedAlbum) {
       throw new NotFoundException();
     }
+    await this.favsService.removeAlbum(id);
   }
 }

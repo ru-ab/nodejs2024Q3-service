@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { Artist } from './artist.interfaces';
 import { CreateArtistDto } from './dto/createArtist.dto';
@@ -6,7 +12,11 @@ import { UpdateArtistDto } from './dto/updateArtist.dto';
 
 @Injectable()
 export class ArtistService {
-  constructor(private readonly repositoryService: RepositoryService<Artist>) {}
+  constructor(
+    private readonly repositoryService: RepositoryService<Artist>,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
 
   create(createArtistDto: CreateArtistDto) {
     return this.repositoryService.create(createArtistDto);
@@ -40,5 +50,6 @@ export class ArtistService {
     if (!removedArtist) {
       throw new NotFoundException();
     }
+    await this.favsService.removeArtist(id);
   }
 }
