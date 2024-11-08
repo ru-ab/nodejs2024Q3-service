@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { CreateUserDto } from './dto/createUser.dto';
 import { User, UserRepository } from './user.interfaces';
 
 export class UserInMemoryRepository implements UserRepository {
@@ -17,7 +16,9 @@ export class UserInMemoryRepository implements UserRepository {
     return user;
   }
 
-  async createUser(dto: CreateUserDto): Promise<User | null> {
+  async createUser(
+    dto: Pick<User, 'login' | 'password'>,
+  ): Promise<User | null> {
     const newUser: User = {
       id: randomUUID(),
       login: dto.login,
@@ -26,6 +27,35 @@ export class UserInMemoryRepository implements UserRepository {
       updatedAt: Date.now(),
       createdAt: Date.now(),
     };
+    this.users.push(newUser);
     return newUser;
+  }
+
+  async updateUser(
+    id: string,
+    dto: Partial<Omit<User, 'id'>>,
+  ): Promise<User | null> {
+    const userIndex = this.users.findIndex((user) => user.id === id);
+    if (userIndex < 0) {
+      return null;
+    }
+
+    const updatedUser: User = {
+      ...this.users[userIndex],
+      ...dto,
+    };
+    this.users[userIndex] = updatedUser;
+
+    return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<User | null> {
+    const user = await this.getById(id);
+    if (!user) {
+      return null;
+    }
+
+    this.users = this.users.filter((user) => user.id !== id);
+    return user;
   }
 }

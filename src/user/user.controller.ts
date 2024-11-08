@@ -1,13 +1,16 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  NotFoundException,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -20,16 +23,26 @@ export class UserController {
   }
 
   @Get(':id')
-  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
-    const user = await this.userService.getById(id);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+  getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.userService.getById(id);
   }
 
   @Post()
   createUser(@Body() dto: CreateUserDto) {
     return this.userService.createUser(dto);
+  }
+
+  @Put(':id')
+  updatePassword(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    return this.userService.updatePassword(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.userService.deleteUser(id);
   }
 }

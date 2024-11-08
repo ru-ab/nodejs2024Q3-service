@@ -1,6 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User, UserRepository } from './user.interfaces';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { User, UserRepository, UserWithoutPassword } from './user.interfaces';
 
 @Injectable()
 export class UserService {
@@ -8,28 +14,67 @@ export class UserService {
     @Inject(UserRepository) private readonly userRepository: UserRepository,
   ) {}
 
-  getAll() {
-    return this.userRepository.getAll();
+  async getAll(): Promise<UserWithoutPassword[]> {
+    const users = await this.userRepository.getAll();
+    const usersWithoutPassword = users.map((user) =>
+      this.excludePasswordFromUser(user),
+    );
+    return usersWithoutPassword;
   }
 
-  getById(id: string) {
-    return this.userRepository.getById(id);
-  }
-
-  async createUser(dto: CreateUserDto): Promise<Omit<User, 'password'> | null> {
-    const user = await this.userRepository.createUser(dto);
+  async getById(id: string): Promise<UserWithoutPassword> {
+    const user = await this.userRepository.getById(id);
     if (!user) {
-      return null;
+      throw new NotFoundException();
+    }
+    const userWithoutPassword = this.excludePasswordFromUser(user);
+    return userWithoutPassword;
+  }
+
+  async createUser(dto: CreateUserDto): Promise<UserWithoutPassword> {
+    const user = await this.userRepository.createUser(dto);
+    const userWithoutPassword = this.excludePasswordFromUser(user);
+    return userWithoutPassword;
+  }
+
+  async updatePassword(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserWithoutPassword> {
+    let user = await this.userRepository.getById(id);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    if (user.password !== dto.oldPassword) {
+      throw new ForbiddenException();
     }
 
-    const userWithoutPassword: Omit<User, 'password'> = {
+    user = await this.userRepository.updateUser(id, {
+      password: dto.newPassword,
+      version: user.version + 1,
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    const userWithoutPassword = this.excludePasswordFromUser(user);
+    return userWithoutPassword;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    const user = await this.userRepository.deleteUser(id);
+    if (!user) {
+      throw new NotFoundException();
+    }
+  }
+
+  private excludePasswordFromUser(user: User): UserWithoutPassword {
+    return {
       id: user.id,
       login: user.login,
       version: user.version,
       updatedAt: user.updatedAt,
       createdAt: user.createdAt,
     };
-
-    return userWithoutPassword;
   }
 }
