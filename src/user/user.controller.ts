@@ -48,7 +48,7 @@ export class UserController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdatePasswordDto,
   ) {
-    let user = await this.userService.findOne(id);
+    const user = await this.userService.findOne(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
