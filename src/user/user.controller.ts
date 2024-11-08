@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -18,31 +20,55 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getAll() {
-    return this.userService.getAll();
+  async findAll() {
+    const users = await this.userService.findAll();
+    const usersWithoutPassword = users.map((user) =>
+      this.userService.excludePasswordFromUser(user),
+    );
+    return usersWithoutPassword;
   }
 
   @Get(':id')
-  getById(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.userService.getById(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    const user = await this.userService.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.userService.excludePasswordFromUser(user);
   }
 
   @Post()
-  createUser(@Body() dto: CreateUserDto) {
-    return this.userService.createUser(dto);
+  async create(@Body() dto: CreateUserDto) {
+    const user = await this.userService.create(dto);
+    return this.userService.excludePasswordFromUser(user);
   }
 
   @Put(':id')
-  updatePassword(
+  async updatePassword(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdatePasswordDto,
   ) {
-    return this.userService.updatePassword(id, dto);
+    let user = await this.userService.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.password !== dto.oldPassword) {
+      throw new ForbiddenException('Wrong old password');
+    }
+
+    const updatedUser = await this.userService.updatePassword(user, dto);
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+    return this.userService.excludePasswordFromUser(updatedUser);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.userService.deleteUser(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    const removedUser = await this.userService.remove(id);
+    if (!removedUser) {
+      throw new NotFoundException('User not found');
+    }
   }
 }

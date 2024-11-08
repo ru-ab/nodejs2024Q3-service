@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { CreateTrackDto } from './dto/createTrack.dto';
@@ -18,11 +13,11 @@ export class TrackService {
     private readonly favsService: FavsService,
   ) {}
 
-  create(createTrackDto: CreateTrackDto) {
+  create(createTrackDto: CreateTrackDto): Promise<Track> {
     return this.repositoryService.create(createTrackDto);
   }
 
-  findAll() {
+  findAll(): Promise<Track[]> {
     return this.repositoryService.findAll();
   }
 
@@ -34,26 +29,30 @@ export class TrackService {
     return track;
   }
 
-  async update(id: string, updateTrackDto: UpdateTrackDto) {
+  async update(
+    id: string,
+    updateTrackDto: UpdateTrackDto,
+  ): Promise<Track | null> {
     const updatedTrack = await this.repositoryService.update(
       id,
       updateTrackDto,
     );
     if (!updatedTrack) {
-      throw new NotFoundException();
+      return null;
     }
     return updatedTrack;
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Track | null> {
     const removedTrack = await this.repositoryService.remove(id);
     if (!removedTrack) {
-      throw new NotFoundException();
+      return null;
     }
     await this.favsService.removeTrack(id);
+    return removedTrack;
   }
 
-  async setArtistToNull(artistId: string) {
+  async setArtistToNull(artistId: string): Promise<void> {
     const tracks = await this.repositoryService.findAll();
     for (const track of tracks) {
       if (track.artistId === artistId) {
@@ -65,7 +64,7 @@ export class TrackService {
     }
   }
 
-  async setAlbumToNull(albumId: string) {
+  async setAlbumToNull(albumId: string): Promise<void> {
     const tracks = await this.repositoryService.findAll();
     for (const track of tracks) {
       if (track.albumId === albumId) {

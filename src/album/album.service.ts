@@ -1,16 +1,10 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { TrackService } from '../track/track.service';
 import { Album } from './album.interfaces';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
-
 @Injectable()
 export class AlbumService {
   constructor(
@@ -21,11 +15,11 @@ export class AlbumService {
     private readonly favsService: FavsService,
   ) {}
 
-  create(createAlbumDto: CreateAlbumDto) {
+  create(createAlbumDto: CreateAlbumDto): Promise<Album> {
     return this.repositoryService.create(createAlbumDto);
   }
 
-  findAll() {
+  findAll(): Promise<Album[]> {
     return this.repositoryService.findAll();
   }
 
@@ -37,27 +31,31 @@ export class AlbumService {
     return album;
   }
 
-  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+  async update(
+    id: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<Album | null> {
     const updatedAlbum = await this.repositoryService.update(
       id,
       updateAlbumDto,
     );
     if (!updatedAlbum) {
-      throw new NotFoundException();
+      return null;
     }
     return updatedAlbum;
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Album | null> {
     const removedAlbum = await this.repositoryService.remove(id);
     if (!removedAlbum) {
-      throw new NotFoundException();
+      return null;
     }
     await this.trackService.setAlbumToNull(id);
     await this.favsService.removeAlbum(id);
+    return removedAlbum;
   }
 
-  async setArtistToNull(artistId: string) {
+  async setArtistToNull(artistId: string): Promise<void> {
     const albums = await this.repositoryService.findAll();
     for (const album of albums) {
       if (album.artistId === artistId) {

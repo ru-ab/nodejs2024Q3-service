@@ -38,16 +38,23 @@ export class AlbumController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    return this.albumService.update(id, updateAlbumDto);
+    const updatedAlbum = await this.albumService.update(id, updateAlbumDto);
+    if (!updatedAlbum) {
+      throw new NotFoundException('Album not found');
+    }
+    return updatedAlbum;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.albumService.remove(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    const removedAlbum = await this.albumService.remove(id);
+    if (!removedAlbum) {
+      throw new NotFoundException('Album not found');
+    }
   }
 }

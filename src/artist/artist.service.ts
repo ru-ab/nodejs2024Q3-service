@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
@@ -24,11 +19,11 @@ export class ArtistService {
     private readonly favsService: FavsService,
   ) {}
 
-  create(createArtistDto: CreateArtistDto) {
+  create(createArtistDto: CreateArtistDto): Promise<Artist> {
     return this.repositoryService.create(createArtistDto);
   }
 
-  findAll() {
+  findAll(): Promise<Artist[]> {
     return this.repositoryService.findAll();
   }
 
@@ -40,24 +35,28 @@ export class ArtistService {
     return artist;
   }
 
-  async update(id: string, updateArtistDto: UpdateArtistDto) {
+  async update(
+    id: string,
+    updateArtistDto: UpdateArtistDto,
+  ): Promise<Artist | null> {
     const updatedArtist = await this.repositoryService.update(
       id,
       updateArtistDto,
     );
     if (!updatedArtist) {
-      throw new NotFoundException();
+      return null;
     }
     return updatedArtist;
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Artist | null> {
     const removedArtist = await this.repositoryService.remove(id);
     if (!removedArtist) {
-      throw new NotFoundException();
+      return null;
     }
     await this.trackService.setArtistToNull(id);
     await this.albumService.setArtistToNull(id);
     await this.favsService.removeArtist(id);
+    return removedArtist;
   }
 }

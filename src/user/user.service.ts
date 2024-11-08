@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RepositoryService } from '../repository/repository.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
@@ -12,67 +8,52 @@ import { User, UserWithoutPassword } from './user.interfaces';
 export class UserService {
   constructor(private readonly repositoryService: RepositoryService<User>) {}
 
-  async getAll(): Promise<UserWithoutPassword[]> {
-    const users = await this.repositoryService.findAll();
-    const usersWithoutPassword = users.map((user) =>
-      this.excludePasswordFromUser(user),
-    );
-    return usersWithoutPassword;
+  async findAll(): Promise<User[]> {
+    return this.repositoryService.findAll();
   }
 
-  async getById(id: string): Promise<UserWithoutPassword> {
+  async findOne(id: string): Promise<User | null> {
     const user = await this.repositoryService.findOne(id);
     if (!user) {
-      throw new NotFoundException();
+      return null;
     }
-    const userWithoutPassword = this.excludePasswordFromUser(user);
-    return userWithoutPassword;
+    return user;
   }
 
-  async createUser(dto: CreateUserDto): Promise<UserWithoutPassword> {
+  async create(dto: CreateUserDto): Promise<User> {
     const user = await this.repositoryService.create({
       ...dto,
       version: 1,
       updatedAt: Date.now(),
       createdAt: Date.now(),
     });
-    const userWithoutPassword = this.excludePasswordFromUser(user);
-    return userWithoutPassword;
+    return user;
   }
 
   async updatePassword(
-    id: string,
+    user: User,
     dto: UpdatePasswordDto,
-  ): Promise<UserWithoutPassword> {
-    let user = await this.repositoryService.findOne(id);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    if (user.password !== dto.oldPassword) {
-      throw new ForbiddenException();
-    }
-
-    user = await this.repositoryService.update(id, {
+  ): Promise<User | null> {
+    const updatedUser = await this.repositoryService.update(user.id, {
       password: dto.newPassword,
       version: user.version + 1,
       updatedAt: Date.now(),
     });
-    if (!user) {
-      throw new NotFoundException();
+    if (!updatedUser) {
+      return null;
     }
-
-    const userWithoutPassword = this.excludePasswordFromUser(user);
-    return userWithoutPassword;
+    return updatedUser;
   }
 
-  async deleteUser(id: string): Promise<void> {
-    const user = await this.repositoryService.remove(id);
-    if (!user) {
-      throw new NotFoundException();
+  async remove(id: string): Promise<User | null> {
+    const removedUser = await this.repositoryService.remove(id);
+    if (!removedUser) {
+      return null;
     }
+    return removedUser;
   }
 
-  private excludePasswordFromUser(user: User): UserWithoutPassword {
+  excludePasswordFromUser(user: User): UserWithoutPassword {
     return {
       id: user.id,
       login: user.login,

@@ -38,16 +38,23 @@ export class TrackController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    return this.trackService.update(id, updateTrackDto);
+    const updatedTrack = await this.trackService.update(id, updateTrackDto);
+    if (!updatedTrack) {
+      throw new NotFoundException('Track not found');
+    }
+    return updatedTrack;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.trackService.remove(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    const removedTrack = await this.trackService.remove(id);
+    if (!removedTrack) {
+      throw new NotFoundException('Track not found');
+    }
   }
 }

@@ -37,16 +37,23 @@ export class ArtistController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
-    return this.artistService.update(id, updateArtistDto);
+    const updatedArtist = await this.artistService.update(id, updateArtistDto);
+    if (!updatedArtist) {
+      throw new NotFoundException('Artist not found');
+    }
+    return updatedArtist;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.artistService.remove(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    const removedArtist = await this.artistService.remove(id);
+    if (!removedArtist) {
+      throw new NotFoundException('Artist not found');
+    }
   }
 }
