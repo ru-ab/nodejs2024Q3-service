@@ -1,11 +1,8 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Album } from '../album/album.interfaces';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
+import { Track } from '../track/track.interfaces';
 import { TrackService } from '../track/track.service';
 
 @Injectable()
@@ -45,48 +42,68 @@ export class FavsService {
     return { tracks, albums, artists };
   }
 
-  async addTrack(id: string) {
-    try {
-      await this.trackService.findOne(id);
-      this.favorites.tracks.push(id);
-    } catch {
-      throw new UnprocessableEntityException();
+  async addTrack(id: string): Promise<Track | null> {
+    const track = await this.trackService.findOne(id);
+    if (!track) {
+      return null;
     }
+
+    this.favorites.tracks.push(id);
+    return track;
   }
 
-  async removeTrack(id: string): Promise<void> {
+  async removeTrack(id: string): Promise<string | null> {
+    if (!this.favorites.tracks.includes(id)) {
+      return null;
+    }
+
     this.favorites.tracks = this.favorites.tracks.filter(
       (trackId) => trackId !== id,
     );
+
+    return id;
   }
 
-  async addAlbum(id: string) {
-    try {
-      await this.albumService.findOne(id);
-      return this.favorites.albums.push(id);
-    } catch {
-      throw new UnprocessableEntityException();
+  async addAlbum(id: string): Promise<Album | null> {
+    const album = await this.albumService.findOne(id);
+    if (!album) {
+      return null;
     }
+
+    this.favorites.albums.push(id);
+    return album;
   }
 
-  async removeAlbum(id: string): Promise<void> {
+  async removeAlbum(id: string): Promise<string | null> {
+    if (!this.favorites.albums.includes(id)) {
+      return null;
+    }
+
     this.favorites.albums = this.favorites.albums.filter(
       (albumId) => albumId !== id,
     );
+
+    return id;
   }
 
   async addArtist(id: string) {
-    try {
-      await this.artistService.findOne(id);
-      return this.favorites.artists.push(id);
-    } catch {
-      throw new UnprocessableEntityException();
+    const artist = await this.artistService.findOne(id);
+    if (!artist) {
+      return null;
     }
+    this.favorites.artists.push(id);
+    return artist;
   }
 
-  async removeArtist(id: string): Promise<void> {
+  async removeArtist(id: string): Promise<string | null> {
+    if (!this.favorites.artists.includes(id)) {
+      return null;
+    }
+
     this.favorites.artists = this.favorites.artists.filter(
       (artistId) => artistId !== id,
     );
+
+    return id;
   }
 }

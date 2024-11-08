@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -22,8 +23,12 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.artistService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    const artist = await this.artistService.findOne(id);
+    if (!artist) {
+      throw new NotFoundException('Artist not found');
+    }
+    return artist;
   }
 
   @Post()

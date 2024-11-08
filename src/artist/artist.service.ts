@@ -32,10 +32,10 @@ export class ArtistService {
     return this.repositoryService.findAll();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Artist | null> {
     const artist = await this.repositoryService.findOne(id);
     if (!artist) {
-      throw new NotFoundException();
+      return null;
     }
     return artist;
   }

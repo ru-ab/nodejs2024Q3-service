@@ -7,7 +7,7 @@ import {
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { CreateTrackDto } from './dto/createTrack.dto';
-import { UpdateTrackDto } from './dto/updatTrack.dto';
+import { UpdateTrackDto } from './dto/updateTrack.dto';
 import { Track } from './track.interfaces';
 
 @Injectable()
@@ -26,10 +26,10 @@ export class TrackService {
     return this.repositoryService.findAll();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Track | null> {
     const track = await this.repositoryService.findOne(id);
     if (!track) {
-      throw new NotFoundException();
+      return null;
     }
     return track;
   }
