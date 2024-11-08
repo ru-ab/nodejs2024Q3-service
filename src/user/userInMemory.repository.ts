@@ -43,6 +43,7 @@ export class UserInMemoryRepository implements UserRepository {
     const updatedUser: User = {
       ...this.users[userIndex],
       ...dto,
+      updatedAt: Date.now(),
     };
     this.users[userIndex] = updatedUser;
 
