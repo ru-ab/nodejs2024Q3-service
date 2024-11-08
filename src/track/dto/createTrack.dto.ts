@@ -1,4 +1,4 @@
-import { IsNumber, IsString, ValidateIf } from 'class-validator';
+import { IsInt, IsString, ValidateIf } from 'class-validator';
 
 export class CreateTrackDto {
   @IsString()
@@ -12,6 +12,6 @@ export class CreateTrackDto {
   @ValidateIf((_, value) => value !== null)
   albumId: string | null; // refers to Album
 
-  @IsNumber()
+  @IsInt()
   duration: number; // integer number
 }
