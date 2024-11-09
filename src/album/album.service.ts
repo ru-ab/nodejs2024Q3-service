@@ -2,9 +2,9 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { TrackService } from '../track/track.service';
-import { Album } from './album.interfaces';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
+import { Album } from './entities/album.entity';
 @Injectable()
 export class AlbumService {
   constructor(

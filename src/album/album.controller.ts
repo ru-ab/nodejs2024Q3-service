@@ -16,6 +16,7 @@ import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
+import { Album } from './entities/album.entity';
 
 @Controller('album')
 export class AlbumController {
@@ -25,18 +26,36 @@ export class AlbumController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all albums' })
-  @ApiResponse({ status: 200, description: 'Returns all albums records' })
+  @ApiOperation({
+    summary: 'Get albums list',
+    description: 'Gets all library albums list',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all albums records',
+    isArray: true,
+    type: Album,
+  })
   findAll() {
     return this.albumService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get single album by ID' })
-  @ApiParam({ name: 'id', description: 'Album ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Get single album by id',
+    description: 'Get single album by id',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Album ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if album record exists',
+    type: Album,
   })
   @ApiResponse({
     status: 400,
@@ -55,10 +74,14 @@ export class AlbumController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create new album' })
+  @ApiOperation({
+    summary: 'Add new album',
+    description: 'Add new album information',
+  })
   @ApiResponse({
     status: 201,
     description: 'Returns if album has been created',
+    type: Album,
   })
   @ApiResponse({
     status: 400,
@@ -76,11 +99,21 @@ export class AlbumController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update album' })
-  @ApiParam({ name: 'id', description: 'Album ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Update album information',
+    description: 'Update library album information by UUID',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Album ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if album has been updated',
+    type: Album,
   })
   @ApiResponse({
     status: 400,
@@ -111,8 +144,17 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete album' })
-  @ApiParam({ name: 'id', description: 'Album ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Delete album',
+    description: 'Delete album from library',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Album ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 204,
     description: 'Returns if album has been removed',

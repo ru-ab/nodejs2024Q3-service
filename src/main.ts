@@ -6,8 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 function configSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
-    .setTitle('Home Library Service: Part 1')
-    .setDescription('The Home Library Service API description')
+    .setTitle('Home Library Service')
+    .setDescription('Home music library service')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);

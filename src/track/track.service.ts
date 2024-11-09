@@ -3,7 +3,7 @@ import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
-import { Track } from './track.interfaces';
+import { Track } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {

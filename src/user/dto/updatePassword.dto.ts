@@ -4,11 +4,15 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class UpdatePasswordDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
-  oldPassword: string; // previous password
+  @ApiProperty({
+    description: "The user's old password",
+  })
+  oldPassword: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
-  newPassword: string; // new password
+  @ApiProperty({
+    description: "The user's new password",
+  })
+  newPassword: string;
 }

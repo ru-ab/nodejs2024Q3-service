@@ -1,8 +1,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Album } from '../album/album.interfaces';
 import { AlbumService } from '../album/album.service';
+import { Album } from '../album/entities/album.entity';
 import { ArtistService } from '../artist/artist.service';
-import { Track } from '../track/track.interfaces';
+import { Track } from '../track/entities/track.entity';
 import { TrackService } from '../track/track.service';
 
 @Injectable()

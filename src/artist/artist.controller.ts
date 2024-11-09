@@ -14,23 +14,39 @@ import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
+import { Artist } from './entities/artist.entity';
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all artists' })
-  @ApiResponse({ status: 200, description: 'Returns all artists records' })
+  @ApiOperation({ summary: 'Get all artists', description: 'Gets all artists' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all artists records',
+    isArray: true,
+    type: Artist,
+  })
   findAll() {
     return this.artistService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get single artist by ID' })
-  @ApiParam({ name: 'id', description: 'Artist ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Get single artist by id',
+    description: 'Get single artist by id',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Artist ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if artist record exists',
+    type: Artist,
   })
   @ApiResponse({
     status: 400,
@@ -49,10 +65,11 @@ export class ArtistController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create new artist' })
+  @ApiOperation({ summary: 'Add new artist', description: 'Add new artist' })
   @ApiResponse({
     status: 201,
     description: 'Returns if artist has been created',
+    type: Artist,
   })
   @ApiResponse({
     status: 400,
@@ -63,11 +80,21 @@ export class ArtistController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update artist' })
-  @ApiParam({ name: 'id', description: 'Artist ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Update artist information',
+    description: 'Update artist information by UUID',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Artist ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if artist has been updated',
+    type: Artist,
   })
   @ApiResponse({
     status: 400,
@@ -90,8 +117,17 @@ export class ArtistController {
 
   @Delete(':id')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete artist' })
-  @ApiParam({ name: 'id', description: 'Artist ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Delete artist',
+    description: 'Delete artist from library',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Artist ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 204,
     description: 'Returns if artist has been removed',

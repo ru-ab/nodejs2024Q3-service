@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RepositoryService } from '../repository/repository.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
-import { User, UserWithoutPassword } from './user.interfaces';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -53,7 +53,7 @@ export class UserService {
     return removedUser;
   }
 
-  excludePasswordFromUser(user: User): UserWithoutPassword {
+  excludePasswordFromUser(user: User): Omit<User, 'password'> {
     return {
       id: user.id,
       login: user.login,

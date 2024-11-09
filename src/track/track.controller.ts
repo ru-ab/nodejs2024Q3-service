@@ -16,6 +16,7 @@ import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
+import { Track } from './entities/track.entity';
 import { TrackService } from './track.service';
 
 @Controller('track')
@@ -27,18 +28,36 @@ export class TrackController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all tracks' })
-  @ApiResponse({ status: 200, description: 'Returns all tracks records' })
+  @ApiOperation({
+    summary: 'Get tracks list',
+    description: 'Gets all library tracks list',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all tracks records',
+    isArray: true,
+    type: Track,
+  })
   findAll() {
     return this.trackService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get single track by ID' })
-  @ApiParam({ name: 'id', description: 'Track ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Get single track by id',
+    description: 'Get single track by id',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Track ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if track record exists',
+    type: Track,
   })
   @ApiResponse({
     status: 400,
@@ -57,10 +76,14 @@ export class TrackController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create new track' })
+  @ApiOperation({
+    summary: 'Add new track',
+    description: 'Add new track information',
+  })
   @ApiResponse({
     status: 201,
     description: 'Returns if track has been created',
+    type: Track,
   })
   @ApiResponse({
     status: 400,
@@ -85,11 +108,21 @@ export class TrackController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update track' })
-  @ApiParam({ name: 'id', description: 'Track ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Update track information',
+    description: 'Update library track information by UUID',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Track ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns if track has been updated',
+    type: Track,
   })
   @ApiResponse({
     status: 400,
@@ -127,8 +160,17 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete track' })
-  @ApiParam({ name: 'id', description: 'Track ID (UUID)', required: true })
+  @ApiOperation({
+    summary: 'Delete track',
+    description: 'Delete track from library',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Track ID',
+    required: true,
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({
     status: 204,
     description: 'Returns if track has been removed',

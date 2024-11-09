@@ -3,9 +3,9 @@ import { AlbumService } from '../album/album.service';
 import { FavsService } from '../favs/favs.service';
 import { RepositoryService } from '../repository/repository.service';
 import { TrackService } from '../track/track.service';
-import { Artist } from './artist.interfaces';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
+import { Artist } from './entities/artist.entity';
 
 @Injectable()
 export class ArtistService {
