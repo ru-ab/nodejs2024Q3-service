@@ -9,6 +9,7 @@ import {
   Post,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { FavsService } from './favs.service';
 
 @Controller('favs')
@@ -16,11 +17,27 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all favorites' })
+  @ApiResponse({ status: 200, description: 'Returns all favorites records' })
   findAll() {
     return this.favsService.findAll();
   }
 
   @Post('track/:id')
+  @ApiOperation({ summary: 'Add track to the favorites' })
+  @ApiParam({ name: 'id', description: 'Track ID (UUID)', required: true })
+  @ApiResponse({
+    status: 201,
+    description: 'Returns if track has been added to the favorites',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if track ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Returns if track with ID does not exist',
+  })
   async addTrack(@Param('id', new ParseUUIDPipe()) id: string) {
     const track = await this.favsService.addTrack(id);
     if (!track) {
@@ -30,6 +47,20 @@ export class FavsController {
 
   @Delete('track/:id')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete track from favorites' })
+  @ApiParam({ name: 'id', description: 'Track ID (UUID)', required: true })
+  @ApiResponse({
+    status: 204,
+    description: 'Returns if track has been removed',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if track ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns if track is not favorite',
+  })
   async removeTrack(@Param('id', new ParseUUIDPipe()) id: string) {
     const removedTrackId = await this.favsService.removeTrack(id);
     if (!removedTrackId) {
@@ -38,6 +69,20 @@ export class FavsController {
   }
 
   @Post('album/:id')
+  @ApiOperation({ summary: 'Add album to the favorites' })
+  @ApiParam({ name: 'id', description: 'Album ID (UUID)', required: true })
+  @ApiResponse({
+    status: 201,
+    description: 'Returns if album has been added to the favorites',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if album ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Returns if album with ID does not exist',
+  })
   async addAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
     const album = await this.favsService.addAlbum(id);
     if (!album) {
@@ -47,6 +92,20 @@ export class FavsController {
 
   @Delete('album/:id')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete album from favorites' })
+  @ApiParam({ name: 'id', description: 'Album ID (UUID)', required: true })
+  @ApiResponse({
+    status: 204,
+    description: 'Returns if album has been removed',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if album ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns if album is not favorite',
+  })
   async removeAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
     const removedAlbumId = await this.favsService.removeAlbum(id);
     if (!removedAlbumId) {
@@ -55,6 +114,20 @@ export class FavsController {
   }
 
   @Post('artist/:id')
+  @ApiOperation({ summary: 'Add artist to the favorites' })
+  @ApiParam({ name: 'id', description: 'Artist ID (UUID)', required: true })
+  @ApiResponse({
+    status: 201,
+    description: 'Returns if artist has been added to the favorites',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if artist ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Returns if artist with ID does not exist',
+  })
   async addArtist(@Param('id', new ParseUUIDPipe()) id: string) {
     const artist = await this.favsService.addArtist(id);
     if (!artist) {
@@ -64,6 +137,20 @@ export class FavsController {
 
   @Delete('artist/:id')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete artist from favorites' })
+  @ApiParam({ name: 'id', description: 'Artist ID (UUID)', required: true })
+  @ApiResponse({
+    status: 204,
+    description: 'Returns if artist has been removed',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Returns if artist ID is not valid UUID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns if artist is not favorite',
+  })
   async removeArtist(@Param('id', new ParseUUIDPipe()) id: string) {
     const removedArtistId = await this.favsService.removeArtist(id);
     if (!removedArtistId) {
