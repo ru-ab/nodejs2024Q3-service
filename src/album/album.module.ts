@@ -4,10 +4,12 @@ import { RepositoryModule } from '../repository/repository.module';
 import { TrackModule } from '../track/track.module';
 import { AlbumController } from './album.controller';
 import { AlbumService } from './album.service';
+import { ArtistModule } from '../artist/artist.module';
 
 @Module({
   imports: [
     RepositoryModule,
+    forwardRef(() => ArtistModule),
     forwardRef(() => TrackModule),
     forwardRef(() => FavsModule),
   ],

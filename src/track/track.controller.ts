@@ -107,6 +107,21 @@ export class TrackController {
     if (!updatedTrack) {
       throw new NotFoundException('Track not found');
     }
+
+    if (updateTrackDto.albumId) {
+      const album = await this.albumService.findOne(updateTrackDto.albumId);
+      if (!album) {
+        throw new BadRequestException('Album with albumId not found');
+      }
+    }
+
+    if (updateTrackDto.artistId) {
+      const artist = await this.artistService.findOne(updateTrackDto.artistId);
+      if (!artist) {
+        throw new BadRequestException('Artist with artistId not found');
+      }
+    }
+
     return updatedTrack;
   }
 
