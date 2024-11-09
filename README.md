@@ -245,7 +245,7 @@ The app supports follow REST API endpoints without any authentication:
     ```
     - Server returns` status code` **400** and corresponding message if `artist` is invalid (not `uuid`)
     - Server returns` status code` **404** and corresponding message if record with `id === artistId` doesn't exist
-  - `DELETE /artist/:id` - delete album
+  - `DELETE /artist/:id` - delete artist
     - Server returns `status code` **204** if the record is found and deleted
     - Server returns `status code` **400** and corresponding message if `artistId` is invalid (not `uuid`)
     - Server returns `status code` **404** and corresponding message if record with `id === artistId` doesn't exist
