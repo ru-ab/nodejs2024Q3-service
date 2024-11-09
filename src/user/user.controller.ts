@@ -11,10 +11,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { UserService } from './user.service';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
