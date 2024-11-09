@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,13 +12,19 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { AlbumService } from '../album/album.service';
+import { ArtistService } from '../artist/artist.service';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
 import { TrackService } from './track.service';
 
 @Controller('track')
 export class TrackController {
-  constructor(private readonly trackService: TrackService) {}
+  constructor(
+    private readonly trackService: TrackService,
+    private readonly albumService: AlbumService,
+    private readonly artistService: ArtistService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all tracks' })
@@ -59,7 +66,21 @@ export class TrackController {
     status: 400,
     description: 'Returns if request body does not contain required fields',
   })
-  create(@Body() createTrackDto: CreateTrackDto) {
+  async create(@Body() createTrackDto: CreateTrackDto) {
+    if (createTrackDto.albumId) {
+      const album = await this.albumService.findOne(createTrackDto.albumId);
+      if (!album) {
+        throw new BadRequestException('Album with albumId not found');
+      }
+    }
+
+    if (createTrackDto.artistId) {
+      const artist = await this.artistService.findOne(createTrackDto.artistId);
+      if (!artist) {
+        throw new BadRequestException('Artist with artistId not found');
+      }
+    }
+
     return this.trackService.create(createTrackDto);
   }
 
