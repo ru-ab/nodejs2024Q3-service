@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
 import { FavsService } from '../favs/favs.service';
-import { RepositoryService } from '../repository/repository.service';
+import { IRepositoryService } from '../repository/repository.interfaces';
 import { TrackService } from '../track/track.service';
 import { CreateArtistDto } from './dto/createArtist.dto';
 import { UpdateArtistDto } from './dto/updateArtist.dto';
@@ -10,7 +10,8 @@ import { Artist } from './entities/artist.entity';
 @Injectable()
 export class ArtistService {
   constructor(
-    private readonly repositoryService: RepositoryService<Artist>,
+    @Inject(IRepositoryService)
+    private readonly repositoryService: IRepositoryService,
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
     @Inject(forwardRef(() => AlbumService))
@@ -20,15 +21,15 @@ export class ArtistService {
   ) {}
 
   create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    return this.repositoryService.create(createArtistDto);
+    return this.repositoryService.artists.create(createArtistDto);
   }
 
   findAll(): Promise<Artist[]> {
-    return this.repositoryService.findAll();
+    return this.repositoryService.artists.findAll();
   }
 
   async findOne(id: string): Promise<Artist | null> {
-    const artist = await this.repositoryService.findOne(id);
+    const artist = await this.repositoryService.artists.findOne(id);
     if (!artist) {
       return null;
     }
@@ -39,7 +40,7 @@ export class ArtistService {
     id: string,
     updateArtistDto: UpdateArtistDto,
   ): Promise<Artist | null> {
-    const updatedArtist = await this.repositoryService.update(
+    const updatedArtist = await this.repositoryService.artists.update(
       id,
       updateArtistDto,
     );
@@ -50,7 +51,7 @@ export class ArtistService {
   }
 
   async remove(id: string): Promise<Artist | null> {
-    const removedArtist = await this.repositoryService.remove(id);
+    const removedArtist = await this.repositoryService.artists.remove(id);
     if (!removedArtist) {
       return null;
     }

@@ -2,22 +2,15 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
 import { Album } from '../album/entities/album.entity';
 import { ArtistService } from '../artist/artist.service';
+import { IRepositoryService } from '../repository/repository.interfaces';
 import { Track } from '../track/entities/track.entity';
 import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class FavsService {
-  private favorites: {
-    tracks: string[];
-    albums: string[];
-    artists: string[];
-  } = {
-    tracks: [],
-    albums: [],
-    artists: [],
-  };
-
   constructor(
+    @Inject(IRepositoryService)
+    private readonly repositoryService: IRepositoryService,
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
     @Inject(forwardRef(() => AlbumService))
@@ -27,16 +20,14 @@ export class FavsService {
   ) {}
 
   async findAll() {
+    const trackIds = await this.repositoryService.favs.tracks.findAll();
+    const albumIds = await this.repositoryService.favs.albums.findAll();
+    const artistIds = await this.repositoryService.favs.artists.findAll();
+
     const [tracks, albums, artists] = await Promise.all([
-      Promise.all(
-        this.favorites.tracks.map((id) => this.trackService.findOne(id)),
-      ),
-      Promise.all(
-        this.favorites.albums.map((id) => this.albumService.findOne(id)),
-      ),
-      Promise.all(
-        this.favorites.artists.map((id) => this.artistService.findOne(id)),
-      ),
+      Promise.all(trackIds.map(({ id }) => this.trackService.findOne(id))),
+      Promise.all(albumIds.map(({ id }) => this.albumService.findOne(id))),
+      Promise.all(artistIds.map(({ id }) => this.artistService.findOne(id))),
     ]);
 
     return { tracks, albums, artists };
@@ -48,19 +39,17 @@ export class FavsService {
       return null;
     }
 
-    this.favorites.tracks.push(id);
+    await this.repositoryService.favs.tracks.create({ id });
     return track;
   }
 
   async removeTrack(id: string): Promise<string | null> {
-    if (!this.favorites.tracks.includes(id)) {
+    const trackItem = await this.repositoryService.favs.tracks.findOne(id);
+    if (!trackItem) {
       return null;
     }
 
-    this.favorites.tracks = this.favorites.tracks.filter(
-      (trackId) => trackId !== id,
-    );
-
+    await this.repositoryService.favs.tracks.remove(trackItem.id);
     return id;
   }
 
@@ -70,19 +59,17 @@ export class FavsService {
       return null;
     }
 
-    this.favorites.albums.push(id);
+    await this.repositoryService.favs.albums.create({ id });
     return album;
   }
 
   async removeAlbum(id: string): Promise<string | null> {
-    if (!this.favorites.albums.includes(id)) {
+    const albumItem = await this.repositoryService.favs.albums.findOne(id);
+    if (!albumItem) {
       return null;
     }
 
-    this.favorites.albums = this.favorites.albums.filter(
-      (albumId) => albumId !== id,
-    );
-
+    await this.repositoryService.favs.albums.remove(albumItem.id);
     return id;
   }
 
@@ -91,19 +78,18 @@ export class FavsService {
     if (!artist) {
       return null;
     }
-    this.favorites.artists.push(id);
+
+    await this.repositoryService.favs.artists.create({ id });
     return artist;
   }
 
   async removeArtist(id: string): Promise<string | null> {
-    if (!this.favorites.artists.includes(id)) {
+    const artistItem = await this.repositoryService.favs.artists.findOne(id);
+    if (!artistItem) {
       return null;
     }
 
-    this.favorites.artists = this.favorites.artists.filter(
-      (artistId) => artistId !== id,
-    );
-
+    await this.repositoryService.favs.artists.remove(artistItem.id);
     return id;
   }
 }
