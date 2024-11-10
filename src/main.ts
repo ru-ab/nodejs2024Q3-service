@@ -1,8 +1,9 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { useContainer } from 'class-validator';
+import { AppModule } from './app.module';
 
 function configSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -16,7 +17,8 @@ function configSwagger(app: INestApplication) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
 
   configSwagger(app);
 

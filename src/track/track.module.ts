@@ -1,28 +1,11 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { AlbumModule } from '../album/album.module';
-import { ArtistModule } from '../artist/artist.module';
-import { FavsModule } from '../favs/favs.module';
-import { IRepositoryService } from '../repository/repository.interfaces';
+import { Module } from '@nestjs/common';
 import { RepositoryModule } from '../repository/repository.module';
-import { RepositoryService } from '../repository/repository.service';
 import { TrackController } from './track.controller';
 import { TrackService } from './track.service';
-
 @Module({
-  imports: [
-    RepositoryModule,
-    forwardRef(() => AlbumModule),
-    forwardRef(() => ArtistModule),
-    forwardRef(() => FavsModule),
-  ],
+  imports: [RepositoryModule],
   controllers: [TrackController],
-  providers: [
-    TrackService,
-    {
-      provide: IRepositoryService,
-      useClass: RepositoryService,
-    },
-  ],
+  providers: [TrackService],
   exports: [TrackService],
 })
 export class TrackModule {}

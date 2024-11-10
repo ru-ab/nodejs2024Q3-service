@@ -1,7 +1,5 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { FavsService } from '../favs/favs.service';
+import { Inject, Injectable } from '@nestjs/common';
 import { IRepositoryService } from '../repository/repository.interfaces';
-import { TrackService } from '../track/track.service';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { Album } from './entities/album.entity';
@@ -10,10 +8,6 @@ export class AlbumService {
   constructor(
     @Inject(IRepositoryService)
     private readonly repositoryService: IRepositoryService,
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
-    @Inject(forwardRef(() => FavsService))
-    private readonly favsService: FavsService,
   ) {}
 
   create(createAlbumDto: CreateAlbumDto): Promise<Album> {
@@ -40,9 +34,6 @@ export class AlbumService {
       id,
       updateAlbumDto,
     );
-    if (!updatedAlbum) {
-      return null;
-    }
     return updatedAlbum;
   }
 
@@ -51,20 +42,18 @@ export class AlbumService {
     if (!removedAlbum) {
       return null;
     }
-    await this.trackService.setAlbumToNull(id);
-    await this.favsService.removeAlbum(id);
-    return removedAlbum;
-  }
 
-  async setArtistToNull(artistId: string): Promise<void> {
-    const albums = await this.repositoryService.albums.findAll();
-    for (const album of albums) {
-      if (album.artistId === artistId) {
-        await this.repositoryService.albums.update(album.id, {
-          ...album,
-          artistId: null,
+    const tracks = await this.repositoryService.tracks.findAll();
+    for (const track of tracks) {
+      if (track.albumId === id) {
+        await this.repositoryService.tracks.update(track.id, {
+          ...track,
+          albumId: null,
         });
       }
     }
+
+    await this.repositoryService.favs.albums.remove(id);
+    return removedAlbum;
   }
 }

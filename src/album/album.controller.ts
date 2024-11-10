@@ -12,7 +12,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
@@ -20,10 +19,7 @@ import { Album } from './entities/album.entity';
 
 @Controller('album')
 export class AlbumController {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly artistService: ArtistService,
-  ) {}
+  constructor(private readonly albumService: AlbumService) {}
 
   @Get()
   @ApiOperation({
@@ -88,11 +84,10 @@ export class AlbumController {
     description: 'Returns if request body does not contain required fields',
   })
   async create(@Body() createAlbumDto: CreateAlbumDto) {
-    if (createAlbumDto.artistId) {
-      const artist = await this.artistService.findOne(createAlbumDto.artistId);
-      if (!artist) {
-        throw new BadRequestException('Artist with artistId not found');
-      }
+    const album = await this.albumService.create(createAlbumDto);
+
+    if (!album) {
+      throw new BadRequestException('Artist with artistId not found');
     }
 
     return this.albumService.create(createAlbumDto);
@@ -130,13 +125,6 @@ export class AlbumController {
     const updatedAlbum = await this.albumService.update(id, updateAlbumDto);
     if (!updatedAlbum) {
       throw new NotFoundException('Album not found');
-    }
-
-    if (updateAlbumDto.artistId) {
-      const artist = await this.artistService.findOne(updateAlbumDto.artistId);
-      if (!artist) {
-        throw new BadRequestException('Artist with artistId not found');
-      }
     }
 
     return updatedAlbum;

@@ -6,6 +6,8 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
+import { AlbumExists } from '../../album/decorators/albumExists.decorator';
+import { ArtistExists } from '../../artist/decorators/artistExists.decorator';
 
 export class CreateTrackDto {
   @IsString()
@@ -15,6 +17,7 @@ export class CreateTrackDto {
   })
   name: string;
 
+  @ArtistExists()
   @IsUUID()
   @ValidateIf((_, value) => value !== null)
   @ApiProperty({
@@ -24,6 +27,7 @@ export class CreateTrackDto {
   })
   artistId: string | null;
 
+  @AlbumExists()
   @IsUUID()
   @ValidateIf((_, value) => value !== null)
   @ApiProperty({

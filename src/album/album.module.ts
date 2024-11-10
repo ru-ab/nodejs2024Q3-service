@@ -1,28 +1,13 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { ArtistModule } from '../artist/artist.module';
-import { FavsModule } from '../favs/favs.module';
-import { IRepositoryService } from '../repository/repository.interfaces';
+import { Module } from '@nestjs/common';
 import { RepositoryModule } from '../repository/repository.module';
-import { RepositoryService } from '../repository/repository.service';
-import { TrackModule } from '../track/track.module';
 import { AlbumController } from './album.controller';
 import { AlbumService } from './album.service';
+import { AlbumExistsRule } from './decorators/albumExists.decorator';
 
 @Module({
-  imports: [
-    RepositoryModule,
-    forwardRef(() => ArtistModule),
-    forwardRef(() => TrackModule),
-    forwardRef(() => FavsModule),
-  ],
+  imports: [RepositoryModule],
   controllers: [AlbumController],
-  providers: [
-    AlbumService,
-    {
-      provide: IRepositoryService,
-      useClass: RepositoryService,
-    },
-  ],
+  providers: [AlbumService, AlbumExistsRule],
   exports: [AlbumService],
 })
 export class AlbumModule {}

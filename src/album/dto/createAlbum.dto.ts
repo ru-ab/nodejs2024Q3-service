@@ -6,6 +6,7 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
+import { ArtistExists } from '../../artist/decorators/artistExists.decorator';
 
 export class CreateAlbumDto {
   @IsString()
@@ -19,6 +20,7 @@ export class CreateAlbumDto {
   })
   year: number;
 
+  @ArtistExists()
   @IsUUID()
   @ValidateIf((_, value) => value !== null)
   @ApiProperty({

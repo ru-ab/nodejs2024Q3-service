@@ -1,22 +1,13 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { AlbumService } from '../album/album.service';
+import { Inject, Injectable } from '@nestjs/common';
 import { Album } from '../album/entities/album.entity';
-import { ArtistService } from '../artist/artist.service';
 import { IRepositoryService } from '../repository/repository.interfaces';
 import { Track } from '../track/entities/track.entity';
-import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class FavsService {
   constructor(
     @Inject(IRepositoryService)
     private readonly repositoryService: IRepositoryService,
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
-    @Inject(forwardRef(() => AlbumService))
-    private readonly albumService: AlbumService,
-    @Inject(forwardRef(() => ArtistService))
-    private readonly artistService: ArtistService,
   ) {}
 
   async findAll() {
@@ -25,16 +16,22 @@ export class FavsService {
     const artistIds = await this.repositoryService.favs.artists.findAll();
 
     const [tracks, albums, artists] = await Promise.all([
-      Promise.all(trackIds.map(({ id }) => this.trackService.findOne(id))),
-      Promise.all(albumIds.map(({ id }) => this.albumService.findOne(id))),
-      Promise.all(artistIds.map(({ id }) => this.artistService.findOne(id))),
+      Promise.all(
+        trackIds.map(({ id }) => this.repositoryService.tracks.findOne(id)),
+      ),
+      Promise.all(
+        albumIds.map(({ id }) => this.repositoryService.albums.findOne(id)),
+      ),
+      Promise.all(
+        artistIds.map(({ id }) => this.repositoryService.artists.findOne(id)),
+      ),
     ]);
 
     return { tracks, albums, artists };
   }
 
   async addTrack(id: string): Promise<Track | null> {
-    const track = await this.trackService.findOne(id);
+    const track = await this.repositoryService.tracks.findOne(id);
     if (!track) {
       return null;
     }
@@ -49,12 +46,12 @@ export class FavsService {
       return null;
     }
 
-    await this.repositoryService.favs.tracks.remove(trackItem.id);
+    await this.repositoryService.favs.tracks.remove(id);
     return id;
   }
 
   async addAlbum(id: string): Promise<Album | null> {
-    const album = await this.albumService.findOne(id);
+    const album = await this.repositoryService.albums.findOne(id);
     if (!album) {
       return null;
     }
@@ -69,12 +66,12 @@ export class FavsService {
       return null;
     }
 
-    await this.repositoryService.favs.albums.remove(albumItem.id);
+    await this.repositoryService.favs.albums.remove(id);
     return id;
   }
 
   async addArtist(id: string) {
-    const artist = await this.artistService.findOne(id);
+    const artist = await this.repositoryService.artists.findOne(id);
     if (!artist) {
       return null;
     }
@@ -89,7 +86,7 @@ export class FavsService {
       return null;
     }
 
-    await this.repositoryService.favs.artists.remove(artistItem.id);
+    await this.repositoryService.favs.artists.remove(id);
     return id;
   }
 }
