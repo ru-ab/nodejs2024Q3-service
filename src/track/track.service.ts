@@ -46,7 +46,6 @@ export class TrackService {
     if (!removedTrack) {
       return null;
     }
-    await this.repositoryService.favs.tracks.remove(id);
     return removedTrack;
   }
 }

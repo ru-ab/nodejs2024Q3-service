@@ -52,8 +52,6 @@ export class AlbumService {
         });
       }
     }
-
-    await this.repositoryService.favs.albums.remove(id);
     return removedAlbum;
   }
 }

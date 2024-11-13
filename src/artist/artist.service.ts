@@ -66,8 +66,6 @@ export class ArtistService {
         });
       }
     }
-
-    await this.repositoryService.favs.artists.remove(id);
     return removedArtist;
   }
 }

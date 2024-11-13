@@ -20,11 +20,6 @@ export interface IRepositoryService {
   albums: IRepositoryResource<Album>;
   artists: IRepositoryResource<Artist>;
   tracks: IRepositoryResource<Track>;
-  favs: {
-    albums: IRepositoryResource<IRepositoryItem>;
-    artists: IRepositoryResource<IRepositoryItem>;
-    tracks: IRepositoryResource<IRepositoryItem>;
-  };
 }
 
 export const IRepositoryService = Symbol('IRepositoryService');
