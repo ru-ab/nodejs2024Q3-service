@@ -1,6 +1,6 @@
+import { Album } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { IRepositoryResource } from '../repository.interfaces';
-import { Album } from '../../album/entities/album.entity';
 
 export class AlbumRepositoryResource implements IRepositoryResource<Album> {
   constructor(private readonly prismaService: PrismaService) {}
@@ -19,14 +19,22 @@ export class AlbumRepositoryResource implements IRepositoryResource<Album> {
     });
   }
 
-  async update(id: string, dto: Partial<Album>): Promise<Album> {
+  async update(id: string, dto: Partial<Album>): Promise<Album | null> {
+    const album = await this.findOne(id);
+    if (!album) {
+      return null;
+    }
     return this.prismaService.album.update({
       where: { id },
       data: dto,
     });
   }
 
-  async remove(id: string): Promise<Album> {
+  async remove(id: string): Promise<Album | null> {
+    const album = await this.findOne(id);
+    if (!album) {
+      return null;
+    }
     return this.prismaService.album.delete({ where: { id } });
   }
 }

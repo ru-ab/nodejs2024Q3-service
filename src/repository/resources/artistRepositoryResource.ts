@@ -1,4 +1,4 @@
-import { Artist } from '../../artist/entities/artist.entity';
+import { Artist } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { IRepositoryResource } from '../repository.interfaces';
 
@@ -19,14 +19,22 @@ export class ArtistRepositoryResource implements IRepositoryResource<Artist> {
     });
   }
 
-  async update(id: string, dto: Partial<Artist>): Promise<Artist> {
+  async update(id: string, dto: Partial<Artist>): Promise<Artist | null> {
+    const artist = await this.findOne(id);
+    if (!artist) {
+      return null;
+    }
     return this.prismaService.artist.update({
       where: { id },
       data: dto,
     });
   }
 
-  async remove(id: string): Promise<Artist> {
+  async remove(id: string): Promise<Artist | null> {
+    const artist = await this.findOne(id);
+    if (!artist) {
+      return null;
+    }
     return this.prismaService.artist.delete({ where: { id } });
   }
 }

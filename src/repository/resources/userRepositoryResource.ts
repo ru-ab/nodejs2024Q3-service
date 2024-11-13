@@ -49,8 +49,12 @@ export class UserRepositoryResource implements IRepositoryResource<User> {
   }
 
   async remove(id: string): Promise<User> {
-    const removedUser = await this.prismaService.user.delete({ where: { id } });
-    return this.convertPrismaUserToUser(removedUser);
+    const removedUser = await this.findOne(id);
+    if (!removedUser) {
+      return null;
+    }
+    await this.prismaService.user.deleteMany({ where: { id } });
+    return removedUser;
   }
 
   private convertPrismaUserToUser(prismaUser: PrismaUser): User {
