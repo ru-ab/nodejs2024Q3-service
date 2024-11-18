@@ -20,33 +20,17 @@ export class TrackService {
   }
 
   async findOne(id: string): Promise<Track | null> {
-    const track = await this.repositoryService.tracks.findOne(id);
-    if (!track) {
-      return null;
-    }
-    return track;
+    return this.repositoryService.tracks.findOne(id);
   }
 
   async update(
     id: string,
     updateTrackDto: UpdateTrackDto,
   ): Promise<Track | null> {
-    const updatedTrack = await this.repositoryService.tracks.update(
-      id,
-      updateTrackDto,
-    );
-    if (!updatedTrack) {
-      return null;
-    }
-    return updatedTrack;
+    return this.repositoryService.tracks.update(id, updateTrackDto);
   }
 
   async remove(id: string): Promise<Track | null> {
-    const removedTrack = await this.repositoryService.tracks.remove(id);
-    if (!removedTrack) {
-      return null;
-    }
-    await this.repositoryService.favs.tracks.remove(id);
-    return removedTrack;
+    return this.repositoryService.tracks.remove(id);
   }
 }

@@ -19,41 +19,17 @@ export class AlbumService {
   }
 
   async findOne(id: string): Promise<Album | null> {
-    const album = await this.repositoryService.albums.findOne(id);
-    if (!album) {
-      return null;
-    }
-    return album;
+    return this.repositoryService.albums.findOne(id);
   }
 
   async update(
     id: string,
     updateAlbumDto: UpdateAlbumDto,
   ): Promise<Album | null> {
-    const updatedAlbum = await this.repositoryService.albums.update(
-      id,
-      updateAlbumDto,
-    );
-    return updatedAlbum;
+    return this.repositoryService.albums.update(id, updateAlbumDto);
   }
 
   async remove(id: string): Promise<Album | null> {
-    const removedAlbum = await this.repositoryService.albums.remove(id);
-    if (!removedAlbum) {
-      return null;
-    }
-
-    const tracks = await this.repositoryService.tracks.findAll();
-    for (const track of tracks) {
-      if (track.albumId === id) {
-        await this.repositoryService.tracks.update(track.id, {
-          ...track,
-          albumId: null,
-        });
-      }
-    }
-
-    await this.repositoryService.favs.albums.remove(id);
-    return removedAlbum;
+    return this.repositoryService.albums.remove(id);
   }
 }

@@ -10,12 +10,12 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { Favs } from './entities/favs.entity';
-import { FavsService } from './favs.service';
+import { Favorite } from './entities/favorite.entity';
+import { FavoriteService } from './favorite.service';
 
 @Controller('favs')
-export class FavsController {
-  constructor(private readonly favsService: FavsService) {}
+export class FavoriteController {
+  constructor(private readonly favoriteService: FavoriteService) {}
 
   @Get()
   @ApiOperation({
@@ -25,10 +25,10 @@ export class FavsController {
   @ApiResponse({
     status: 200,
     description: 'Returns all favorites records',
-    type: Favs,
+    type: Favorite,
   })
   findAll() {
-    return this.favsService.findAll();
+    return this.favoriteService.getFavorites();
   }
 
   @Post('track/:id')
@@ -56,7 +56,7 @@ export class FavsController {
     description: 'Returns if track with ID does not exist',
   })
   async addTrack(@Param('id', new ParseUUIDPipe()) id: string) {
-    const track = await this.favsService.addTrack(id);
+    const track = await this.favoriteService.addTrack(id);
     if (!track) {
       throw new UnprocessableEntityException(`Track with ${id} doesn't exist`);
     }
@@ -88,7 +88,7 @@ export class FavsController {
     description: 'Returns if track is not favorite',
   })
   async removeTrack(@Param('id', new ParseUUIDPipe()) id: string) {
-    const removedTrackId = await this.favsService.removeTrack(id);
+    const removedTrackId = await this.favoriteService.removeTrack(id);
     if (!removedTrackId) {
       throw new NotFoundException('Track is not favorite');
     }
@@ -119,7 +119,7 @@ export class FavsController {
     description: 'Returns if album with ID does not exist',
   })
   async addAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
-    const album = await this.favsService.addAlbum(id);
+    const album = await this.favoriteService.addAlbum(id);
     if (!album) {
       throw new UnprocessableEntityException(`Album with ${id} doesn't exist`);
     }
@@ -151,7 +151,7 @@ export class FavsController {
     description: 'Returns if album is not favorite',
   })
   async removeAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
-    const removedAlbumId = await this.favsService.removeAlbum(id);
+    const removedAlbumId = await this.favoriteService.removeAlbum(id);
     if (!removedAlbumId) {
       throw new NotFoundException('Album is not favorite');
     }
@@ -182,7 +182,7 @@ export class FavsController {
     description: 'Returns if artist with ID does not exist',
   })
   async addArtist(@Param('id', new ParseUUIDPipe()) id: string) {
-    const artist = await this.favsService.addArtist(id);
+    const artist = await this.favoriteService.addArtist(id);
     if (!artist) {
       throw new UnprocessableEntityException(`Artist with ${id} doesn't exist`);
     }
@@ -214,7 +214,7 @@ export class FavsController {
     description: 'Returns if artist is not favorite',
   })
   async removeArtist(@Param('id', new ParseUUIDPipe()) id: string) {
-    const removedArtistId = await this.favsService.removeArtist(id);
+    const removedArtistId = await this.favoriteService.removeArtist(id);
     if (!removedArtistId) {
       throw new NotFoundException('Artist is not favorite');
     }

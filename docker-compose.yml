@@ -1,0 +1,50 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/db.Dockerfile
+    image: rustam902/nodejs2024q3-service-db
+    restart: always
+    networks:
+      - app_net
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - db_logs:/var/lib/postgresql/logs
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+  app:
+    depends_on:
+      db:
+        condition: service_started
+    build:
+      context: .
+      dockerfile: ./docker/app.Dockerfile
+      target: build
+    image: rustam902/nodejs2024q3-service-app
+    restart: always
+    networks:
+      - app_net
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+    develop:
+      watch:
+        - action: sync+restart
+          path: src
+          target: /app/src
+
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+
+volumes:
+  db_data:
+  db_logs:

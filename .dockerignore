@@ -1,0 +1,17 @@
+node_modules
+dist
+doc
+docker
+test
+.git
+
+.env*
+.dockerignore
+.gitignore
+.prettierrc
+.DS_Store
+.eslintrc.js
+docker-compose.yml
+jest.config.json
+nest-cli.json
+README.md

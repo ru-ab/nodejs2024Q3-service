@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Node.js, v22.9.0 - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 
 ## Downloading
 
@@ -14,26 +14,110 @@ git clone https://github.com/ru-ab/nodejs2024Q3-service.git
 ## Installing NPM modules
 
 ```
-npm install
+npm install --legacy-peer-deps
 ```
 
-## Environment variables
+## Environment Variables
 
-You can change the default port on which the app runs in the .env file located at the root of the project. For example:
+### Application Port
+
+You can change the default port on which the app runs in the `.env` file located at the root of the project. For example:
 
 ```bash
 PORT=4000
 ```
 
-## Running application
+### Database Connection
 
+You can specify the PostgreSQL database connection parameters int the `.env` file:
+
+```bash
+POSTGRES_HOST=localhost # if you run the app using docker-compose.yml file this value will be ignored
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=mydb
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
 ```
-npm start
+
+## Running Application
+
+### Running Using Docker Containers
+
+To run the application in Docker containers you first need to install `docker` on your device. [How to install Docker](https://docs.docker.com/engine/install/).
+
+The application consist of two containers:
+
+- `app` - NestJS application with all necessary dependencies. Built from `./docker/app.Dockerfile`.
+- `db` - PostgreSQL server for the application. Built from `./docker/db.Dockerfile`.
+  - The `db` container uses two volumes:
+    - `nodejs2024q3-service_db_data` - stores all the database data
+    - `nodejs2024q3-service_db_logs` - stores all the database logs
+
+Modify the database connection values to specify the database port, database name, and user:
+
+```bash
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=mydb
+```
+
+The application uses the `docker-compose.yml` file for building and running the application. To start the app run one of these commands:
+
+```bash
+# Run the containers and see all the logs in the console
+docker compose up
+
+# Run the containers in the "detached" mode
+docker compose up -d
+
+# Run the containers in the "watch" mode (the application in the container restarts if changes made in the src folder)
+docker compose up --watch
+```
+
+To stop the containers run the following command:
+
+```bash
+docker compose down
+```
+
+### Running Using Local Node Installation
+
+To run the application locally you need to specify your PostgreSQL connection parameters in the `.env` file, for example:
+
+```bash
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=mydb
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
+```
+
+To start the application run the following command:
+
+```bash
+npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/api/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+## Scan Docker Images For Vulnerabilities
+
+For scanning purposes [Trivy](https://trivy.dev/) is used, running in a Docker container.
+
+To scan images run one of the following commands:
+
+```bash
+# Scan the app container
+npm run scan:app
+
+# Scan the db container
+npm run scan:db
+```
 
 ## Testing
 
@@ -51,7 +135,7 @@ To run only one of all test suites
 npm run test -- <path to suite>
 ```
 
-### Auto-fix and format
+### Auto-fix and Format
 
 ```
 npm run lint
@@ -67,7 +151,7 @@ Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
 
-## Application usage
+## Application Usage
 
 The app supports follow REST API endpoints without any authentication:
 

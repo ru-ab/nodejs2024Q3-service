@@ -16,44 +16,31 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User | null> {
-    const user = await this.repositoryService.users.findOne(id);
-    if (!user) {
-      return null;
-    }
-    return user;
+    return this.repositoryService.users.findOne(id);
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const user = await this.repositoryService.users.create({
+    return this.repositoryService.users.create({
       ...dto,
       version: 1,
       updatedAt: Date.now(),
       createdAt: Date.now(),
     });
-    return user;
   }
 
   async updatePassword(
     user: User,
     dto: UpdatePasswordDto,
   ): Promise<User | null> {
-    const updatedUser = await this.repositoryService.users.update(user.id, {
+    return this.repositoryService.users.update(user.id, {
       password: dto.newPassword,
       version: user.version + 1,
       updatedAt: Date.now(),
     });
-    if (!updatedUser) {
-      return null;
-    }
-    return updatedUser;
   }
 
   async remove(id: string): Promise<User | null> {
-    const removedUser = await this.repositoryService.users.remove(id);
-    if (!removedUser) {
-      return null;
-    }
-    return removedUser;
+    return this.repositoryService.users.remove(id);
   }
 
   excludePasswordFromUser(user: User): Omit<User, 'password'> {
