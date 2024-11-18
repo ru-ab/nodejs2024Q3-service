@@ -1,4 +1,4 @@
-FROM postgres:17
+FROM postgres:17-alpine
 
 COPY --chown=postgres:postgres ./postgresql.conf /etc/postgresql/postgresql.conf
 
