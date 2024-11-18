@@ -31,7 +31,7 @@ services:
     ports:
       - '${PORT}:${PORT}'
     environment:
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
     develop:
       watch:
         - action: sync+restart
