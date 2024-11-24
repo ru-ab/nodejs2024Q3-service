@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
+import { LoggerServiceImp } from './logger/logger.service';
 
 function configSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -16,9 +17,12 @@ function configSwagger(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
+  app.useLogger(app.get(LoggerServiceImp));
 
   configSwagger(app);
 
