@@ -9,13 +9,7 @@ import { AuthGuard } from './auth.guard';
 
 @Global()
 @Module({
-  imports: [
-    UserModule,
-    JwtModule.register({
-      secret: 'Secret',
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
+  imports: [UserModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,
