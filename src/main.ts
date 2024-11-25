@@ -28,9 +28,7 @@ process.on('unhandledRejection', (error) => {
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
-  });
+  const app = await NestFactory.create(AppModule);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
   app.useLogger(app.get(LoggerServiceImp));
