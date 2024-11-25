@@ -7,6 +7,7 @@ import { FavoriteModule } from './favorite/favorite.module';
 import { LoggerModule } from './logger/logger.module';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     TrackModule,
     FavoriteModule,
     LoggerModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

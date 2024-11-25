@@ -19,6 +19,14 @@ export class UserRepositoryResource implements IRepositoryResource<User> {
     return this.convertPrismaUserToUser(user);
   }
 
+  async findOneByLogin(login: string): Promise<User> {
+    const user = await this.prismaService.user.findFirst({ where: { login } });
+    if (!user) {
+      return null;
+    }
+    return this.convertPrismaUserToUser(user);
+  }
+
   async create<D extends User>(dto: Omit<D, 'id'>): Promise<User> {
     const newUser = await this.prismaService.user.create({
       data: {

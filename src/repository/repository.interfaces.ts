@@ -1,6 +1,6 @@
 import { Album, Artist, Track } from '@prisma/client';
-import { User } from '../user/entities/user.entity';
 import { FavoriteRepositoryResource } from './resources/favoriteRepositoryResource';
+import { UserRepositoryResource } from './resources/userRepositoryResource';
 
 export interface IRepositoryItem {
   id: string;
@@ -15,7 +15,7 @@ export interface IRepositoryResource<T extends IRepositoryItem> {
 }
 
 export interface IRepositoryService {
-  users: IRepositoryResource<User>;
+  users: UserRepositoryResource;
   albums: IRepositoryResource<Album>;
   artists: IRepositoryResource<Artist>;
   tracks: IRepositoryResource<Track>;

@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -81,9 +80,8 @@ export class UserController {
     status: 400,
     description: 'Returns if request body does not contain required fields',
   })
-  async create(@Body() dto: CreateUserDto) {
-    const user = await this.userService.create(dto);
-    return this.userService.excludePasswordFromUser(user);
+  create(@Body() dto: CreateUserDto) {
+    return this.userService.create(dto);
   }
 
   @Put(':id')
@@ -119,19 +117,7 @@ export class UserController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdatePasswordDto,
   ) {
-    const user = await this.userService.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    if (user.password !== dto.oldPassword) {
-      throw new ForbiddenException('Wrong old password');
-    }
-
-    const updatedUser = await this.userService.updatePassword(user, dto);
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
-    }
-    return this.userService.excludePasswordFromUser(updatedUser);
+    return this.userService.updatePassword(id, dto);
   }
 
   @Delete(':id')

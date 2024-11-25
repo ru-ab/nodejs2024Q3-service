@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../user/entities/user.entity';
+import { Album, Artist, Track } from '@prisma/client';
 import { PrismaService } from './prisma.service';
 import {
   IRepositoryResource,
@@ -10,11 +10,10 @@ import { ArtistRepositoryResource } from './resources/artistRepositoryResource';
 import { FavoriteRepositoryResource } from './resources/favoriteRepositoryResource';
 import { TrackRepositoryResource } from './resources/trackRepositoryResource';
 import { UserRepositoryResource } from './resources/userRepositoryResource';
-import { Album, Artist, Track } from '@prisma/client';
 
 @Injectable()
 export class RepositoryService implements IRepositoryService {
-  public users: IRepositoryResource<User>;
+  public users: UserRepositoryResource;
   public albums: IRepositoryResource<Album>;
   public artists: IRepositoryResource<Artist>;
   public tracks: IRepositoryResource<Track>;
