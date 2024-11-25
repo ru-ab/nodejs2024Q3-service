@@ -1,15 +1,16 @@
 import { Global, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
-import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth.guard';
 
 @Global()
 @Module({
-  imports: [UserModule, JwtModule],
+  imports: [ConfigModule, UserModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,

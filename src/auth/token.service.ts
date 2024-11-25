@@ -1,19 +1,38 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
 
 @Injectable()
 export class TokenService {
-  constructor(private readonly jwtService: JwtService) {}
+  private jwtSecretKey: string;
+  private jwtSecretRefreshKey: string;
+  private tokenExpireTime: string;
+  private tokenRefreshExpireTime: string;
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+  ) {
+    this.jwtSecretKey = this.configService.getOrThrow<string>('JWT_SECRET_KEY');
+    this.jwtSecretRefreshKey = this.configService.getOrThrow<string>(
+      'JWT_SECRET_REFRESH_KEY',
+    );
+    this.tokenExpireTime =
+      this.configService.getOrThrow<string>('TOKEN_EXPIRE_TIME');
+    this.tokenRefreshExpireTime = this.configService.getOrThrow<string>(
+      'TOKEN_REFRESH_EXPIRE_TIME',
+    );
+  }
 
   async generateTokens(payload: TokenPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: 'Secret',
-      expiresIn: '60s',
+      secret: this.jwtSecretKey,
+      expiresIn: this.tokenExpireTime,
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: 'RefreshSecret',
-      expiresIn: '30d',
+      secret: this.jwtSecretRefreshKey,
+      expiresIn: this.tokenRefreshExpireTime,
     });
 
     return {
@@ -27,7 +46,7 @@ export class TokenService {
       const payload = await this.jwtService.verifyAsync<TokenPayload>(
         accessToken,
         {
-          secret: 'Secret',
+          secret: this.jwtSecretKey,
         },
       );
       return {
@@ -44,7 +63,7 @@ export class TokenService {
       const payload = await this.jwtService.verifyAsync<TokenPayload>(
         refreshToken,
         {
-          secret: 'RefreshSecret',
+          secret: this.jwtSecretRefreshKey,
         },
       );
       return {
