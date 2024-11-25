@@ -23,7 +23,7 @@ npm install --legacy-peer-deps
 
 You can change the default port on which the app runs in the `.env` file located at the root of the project. For example:
 
-```bash
+```ini
 PORT=4000
 ```
 
@@ -31,13 +31,48 @@ PORT=4000
 
 You can specify the PostgreSQL database connection parameters int the `.env` file:
 
-```bash
+```ini
 POSTGRES_HOST=localhost # if you run the app using docker-compose.yml file this value will be ignored
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
 POSTGRES_DB=mydb
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
+```
+
+### Logging
+
+You can specify logging level (a level with higher number will log also the levels with a lower number) and max file size (in kilobytes).
+
+```ini
+# Log levels
+# ===========
+# error   = 0
+# warn    = 1
+# log     = 2
+# verbose = 3
+# debug   = 4
+LOG_LEVEL=debug
+LOG_MAX_FILE_SIZE=4
+```
+
+### Password encryption
+
+Define hash salt rounds:
+
+```ini
+CRYPT_SALT=10
+```
+
+### Authentication
+
+Application uses JWT token for authentication purposes.
+
+```ini
+JWT_SECRET_KEY=secret123123
+JWT_SECRET_REFRESH_KEY=secret123123
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
 ```
 
 ## Running Application
@@ -49,18 +84,32 @@ To run the application in Docker containers you first need to install `docker` o
 The application consist of two containers:
 
 - `app` - NestJS application with all necessary dependencies. Built from `./docker/app.Dockerfile`.
+  - The `app` container mounts `./logs` folder for logs writing;
 - `db` - PostgreSQL server for the application. Built from `./docker/db.Dockerfile`.
   - The `db` container uses two volumes:
-    - `nodejs2024q3-service_db_data` - stores all the database data
-    - `nodejs2024q3-service_db_logs` - stores all the database logs
+    - `nodejs2024q3-service_db_data` - stores all the database data;
+    - `nodejs2024q3-service_db_logs` - stores all the database logs.
 
 Modify the database connection values to specify the database port, database name, and user:
 
-```bash
+```ini
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
 POSTGRES_DB=mydb
+```
+
+Specify the logging level, JWT secrets and parameters:
+
+```ini
+LOG_LEVEL=debug
+LOG_MAX_FILE_SIZE=4
+
+CRYPT_SALT=10
+JWT_SECRET_KEY=secret123123
+JWT_SECRET_REFRESH_KEY=secret123123
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
 ```
 
 The application uses the `docker-compose.yml` file for building and running the application. To start the app run one of these commands:
@@ -86,13 +135,26 @@ docker compose down
 
 To run the application locally you need to specify your PostgreSQL connection parameters in the `.env` file, for example:
 
-```bash
+```ini
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
 POSTGRES_DB=mydb
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
+```
+
+Specify the logging level, JWT secrets and parameters:
+
+```ini
+LOG_LEVEL=debug
+LOG_MAX_FILE_SIZE=4
+
+CRYPT_SALT=10
+JWT_SECRET_KEY=secret123123
+JWT_SECRET_REFRESH_KEY=secret123123
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
 ```
 
 To start the application run the following command:
@@ -153,9 +215,24 @@ For more information, visit: https://code.visualstudio.com/docs/editor/debugging
 
 ## Application Usage
 
-The app supports follow REST API endpoints without any authentication:
+The app supports follow REST API endpoints:
 
-- `Users` (`/user` route)
+- `Signup` (`auth/signup` route)
+  - `POST auth/signup` - send `login` and `password` to create a new `user`
+    - Server returns `status code` **201** and corresponding message if dto is valid
+    - Server returns `status code` **400** and corresponding message if dto is invalid (no `login` or `password`, or they are not a `strings`)
+- `Login` (`auth/login` route)
+  - `POST auth/login` - send `login` and `password` to get Access token and Refresh token
+    - Server returns `status code` **200** and tokens if dto is valid
+    - Server returns `status code` **400** and corresponding message if dto is invalid (no `login` or `password`, or they are not a `strings`)
+    - Server returns `status code` **403** and corresponding message if authentication failed (no user with such `login`, `password` doesn't match actual one, etc.)
+- `Refresh` (`auth/refresh` route)
+  - `POST auth/refresh` - send refresh token in body as `{ refreshToken }` to get new pair of Access token and Refresh token
+    - Server returns `status code` **200** and tokens in body if dto is valid
+    - Server returns `status code` **401** and corresponding message if dto is invalid (no `refreshToken` in body)
+    - Server returns `status code` **403** and corresponding message if authentication failed (Refresh token is invalid or expired)
+
+* `Users` (`/user` route)
 
   - `GET /user` - get all users
     - Server returns `status code` **200** and array of users records:
@@ -230,7 +307,7 @@ The app supports follow REST API endpoints without any authentication:
     - Server returns `status code` **400** and corresponding message if `userId` is invalid (not `uuid`)
     - Server returns `status code` **404** and corresponding message if record with `id === userId` doesn't exist
 
-- `Tracks` (`/track` route)
+* `Tracks` (`/track` route)
 
   - `GET /track` - get all tracks
     - Server returns `status code` **200** and array of tracks records:
@@ -286,7 +363,7 @@ The app supports follow REST API endpoints without any authentication:
     - Server returns `status code` **400** and corresponding message if `trackId` is invalid (not `uuid`)
     - Server returns `status code` **404** and corresponding message if record with `id === trackId` doesn't exist
 
-- `Artists` (`/artist` route)
+* `Artists` (`/artist` route)
 
   - `GET /artist` - get all artists
     - Server returns `status code` **200** and array of artists records:
@@ -334,7 +411,7 @@ The app supports follow REST API endpoints without any authentication:
     - Server returns `status code` **400** and corresponding message if `artistId` is invalid (not `uuid`)
     - Server returns `status code` **404** and corresponding message if record with `id === artistId` doesn't exist
 
-- `Albums` (`/album` route)
+* `Albums` (`/album` route)
 
   - `GET /album` - get all albums
     - Server returns `status code` **200** and array of albums records:
@@ -386,7 +463,7 @@ The app supports follow REST API endpoints without any authentication:
     - Server returns `status code` **400** and corresponding message if `albumId` is invalid (not `uuid`)
     - Server returns `status code` **404** and corresponding message if record with `id === albumId` doesn't exist
 
-- `Favorites`
+* `Favorites`
   - `GET /favs` - get all favorites
     - Server returns `status code` **200** and all favorite records (**not their ids**), split by entity type:
     ```typescript
