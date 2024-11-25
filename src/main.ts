@@ -18,12 +18,12 @@ function configSwagger(app: INestApplication) {
 }
 
 process.on('uncaughtException', (error) => {
-  const logger = new Logger('uncaughtException');
+  const logger = new Logger('UncaughtException');
   logger.error(error);
 });
 
 process.on('unhandledRejection', (error) => {
-  const logger = new Logger('unhandledRejection');
+  const logger = new Logger('UnhandledRejection');
   logger.error(error);
 });
 
