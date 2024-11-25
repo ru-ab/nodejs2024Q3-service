@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { SignUpDto } from './dto/signUp.dto';
 import { TokenService } from './token.service';
 
@@ -34,6 +35,13 @@ export class AuthService {
       login: user.login,
     };
 
+    return this.tokenService.generateTokens(payload);
+  }
+
+  async refresh(dto: RefreshDto) {
+    const payload = await this.tokenService.getRefreshTokenPayload(
+      dto.refreshToken,
+    );
     return this.tokenService.generateTokens(payload);
   }
 }

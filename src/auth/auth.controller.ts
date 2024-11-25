@@ -1,11 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, UseFilters } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '../common/decorators/public.decorator';
 import { User } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { SignUpDto } from './dto/signUp.dto';
 import { LoginResponse } from './entities/loginResponse';
+import { BadRequestToUnauthorizedFilter } from './filters/badRequestToUnauthorized.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -46,5 +48,30 @@ export class AuthController {
   })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Public()
+  @Post('/refresh')
+  @HttpCode(200)
+  @UseFilters(new BadRequestToUnauthorizedFilter())
+  @ApiOperation({
+    summary: 'Refresh Tokens',
+    description: 'Returns a new tokens pair',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns if new tokens have been generated',
+    type: LoginResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns if refreshToken not exists or is not string',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Returns if refreshToken is invalid',
+  })
+  refresh(@Body() dto: RefreshDto) {
+    return this.authService.refresh(dto);
   }
 }
