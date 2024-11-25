@@ -14,7 +14,7 @@ export class FileLoggerService {
   private maxFileSizeInKB: number;
 
   constructor(private readonly configService: ConfigService) {
-    this.logsFolderPath = path.join(__dirname, '..', '..', 'logs');
+    this.logsFolderPath = path.join(process.cwd(), 'logs');
     this.appLogFileName = 'app.log';
     this.errorsLogFileName = 'errors.log';
 

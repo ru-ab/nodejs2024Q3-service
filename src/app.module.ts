@@ -12,13 +12,13 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    LoggerModule,
+    AuthModule,
     UserModule,
     ArtistModule,
     AlbumModule,
     TrackModule,
     FavoriteModule,
-    LoggerModule,
-    AuthModule,
   ],
   controllers: [],
   providers: [],

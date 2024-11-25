@@ -32,11 +32,28 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     this.logger.error(
-      `Error occurred: ${
-        exception instanceof Error ? exception.message : errorResponse.message
-      }`,
+      createLogMessage(
+        request,
+        errorResponse.statusCode,
+        errorResponse.message,
+      ),
     );
 
     response.status(errorResponse.statusCode).json(responseBody);
   }
+}
+
+function createLogMessage(
+  req: Request,
+  statusCode: number,
+  errorMessage: string,
+) {
+  const { method, originalUrl, query, body } = req;
+  const urlString = `url=${originalUrl}`;
+  const queryString = `query=${JSON.stringify(query)}`;
+  const bodyString = `body=${JSON.stringify(body)}`;
+  const statusCodeString = `statusCode=${statusCode}`;
+  const errorMessageString = `errorMessage=${errorMessage}`;
+
+  return `${method} ${urlString} ${queryString} ${bodyString} ${statusCodeString} ${errorMessageString}`;
 }
