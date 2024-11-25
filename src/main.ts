@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -16,6 +16,16 @@ function configSwagger(app: INestApplication) {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 }
+
+process.on('uncaughtException', (error) => {
+  const logger = new Logger('uncaughtException');
+  logger.error(error);
+});
+
+process.on('unhandledRejection', (error) => {
+  const logger = new Logger('unhandledRejection');
+  logger.error(error);
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
